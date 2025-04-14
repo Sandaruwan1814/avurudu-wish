@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>සුබ අලුත් අවුරුද්දක් වේවා!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+      font-family: 'Noto Sans Sinhala', sans-serif;
+      overflow: hidden;
+    }
+    h1 {
+      text-align: center;
+      font-size: 3em;
+      margin-top: 20%;
+      animation: pulse 2s infinite;
+      z-index: 10;
+      position: relative;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); color: #ffeb3b; }
+      50% { transform: scale(1.1); color: #ff9800; }
+      100% { transform: scale(1); color: #ffeb3b; }
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>සුබ අලුත් අවුරුද්දක් වේවා!</h1>
+  <canvas id="fireworks"></canvas>
+  <audio autoplay loop>
+    <source src="https://www.soundjay.com/explosion/sounds/fireworks-1.mp3" type="audio/mpeg">
+  </audio>
+  <script>
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    let cw, ch;
+    function resizeCanvas() {
+      cw = canvas.width = window.innerWidth;
+      ch = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let fireworks = [];
+
+    function createFirework() {
+      const x = Math.random() * cw;
+      const y = Math.random() * ch / 2;
+      const particles = [];
+      for (let i = 0; i < 100; i++) {
+        particles.push({
+          x, y,
+          dx: Math.random() * 4 - 2,
+          dy: Math.random() * 4 - 2,
+          life: 100,
+          color: `hsl(${Math.random() * 360}, 100%, 50%)`
+        });
+      }
+      fireworks.push(particles);
+    }
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+      ctx.fillRect(0, 0, cw, ch);
+      for (let i = 0; i < fireworks.length; i++) {
+        const particles = fireworks[i];
+        for (let j = 0; j < particles.length; j++) {
+          const p = particles[j];
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+          p.x += p.dx;
+          p.y += p.dy;
+          p.life--;
+        }
+        fireworks[i] = particles.filter(p => p.life > 0);
+      }
+      fireworks = fireworks.filter(particles => particles.length > 0);
+      requestAnimationFrame(draw);
+    }
+
+    setInterval(createFirework, 1000);
+    draw();
+  </script>
+</body>
+</html>
